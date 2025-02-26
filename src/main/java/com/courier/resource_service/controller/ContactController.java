@@ -22,7 +22,7 @@ import com.courier.resource_service.objects.dto.ContactDto;
 import com.courier.resource_service.service.ContactService;
 
 @RestController
-@RequestMapping("/api/courier/resource/contact")
+@RequestMapping("/api/resource/contact")
 public class ContactController {
 
   @Autowired private ContactService contactService;
@@ -78,4 +78,3 @@ public class ContactController {
     return ResponseEntity.ok(contactService.getContactsByBranch(branchId));
   }
 }
-

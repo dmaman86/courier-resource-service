@@ -22,7 +22,7 @@ import com.courier.resource_service.objects.dto.OfficeDto;
 import com.courier.resource_service.service.OfficeService;
 
 @RestController
-@RequestMapping("/api/courier/resource/office")
+@RequestMapping("/api/resource/office")
 public class OfficeController {
 
   @Autowired private OfficeService officeService;
@@ -74,4 +74,3 @@ public class OfficeController {
     return ResponseEntity.ok(officeService.searchOffices(query, pageable));
   }
 }
-

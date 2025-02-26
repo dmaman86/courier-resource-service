@@ -22,7 +22,7 @@ import com.courier.resource_service.objects.dto.BranchDto;
 import com.courier.resource_service.service.BranchService;
 
 @RestController
-@RequestMapping("/api/courier/resource/branch")
+@RequestMapping("/api/resource/branch")
 public class BranchController {
 
   @Autowired private BranchService branchService;
