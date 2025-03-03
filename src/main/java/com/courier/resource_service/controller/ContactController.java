@@ -62,6 +62,12 @@ public class ContactController {
     return ResponseEntity.noContent().build();
   }
 
+  @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+  @PostMapping("/enable")
+  public ResponseEntity<ContactDto> enableContact(@RequestBody ContactDto contactDto) {
+    return ResponseEntity.ok(contactService.enableContact(contactDto));
+  }
+
   @GetMapping("/search")
   public ResponseEntity<Page<ContactBaseDto>> searchContacts(
       @RequestParam String query, Pageable pageable) {

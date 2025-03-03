@@ -3,6 +3,7 @@ package com.courier.resource_service.service.impl;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -22,18 +23,11 @@ import jakarta.persistence.EntityNotFoundException;
 @Service
 public class ContactServiceImpl implements ContactService {
 
-  private final ContactRepository contactRepository;
-  private final ContactMapper contactMapper;
-  private final ContactManager contactManager;
+  @Autowired private ContactRepository contactRepository;
 
-  public ContactServiceImpl(
-      ContactRepository contactRepository,
-      ContactMapper contactMapper,
-      ContactManager contactManager) {
-    this.contactRepository = contactRepository;
-    this.contactMapper = contactMapper;
-    this.contactManager = contactManager;
-  }
+  @Autowired private ContactMapper contactMapper;
+
+  @Autowired private ContactManager contactManager;
 
   @Override
   public Page<ContactBaseDto> getContacts(Pageable pageable) {
@@ -84,6 +78,11 @@ public class ContactServiceImpl implements ContactService {
   @Override
   public void disabledContact(Long id) {
     contactManager.disableContact(id);
+  }
+
+  @Override
+  public ContactDto enableContact(ContactDto contactDto) {
+    return contactMapper.toDto(contactManager.enableContact(contactDto));
   }
 
   @Override

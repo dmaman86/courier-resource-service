@@ -26,5 +26,7 @@ public interface ContactService {
 
   void disabledContact(Long id);
 
+  ContactDto enableContact(ContactDto contactDto);
+
   Page<ContactBaseDto> searchContacts(String searchQuery, Pageable pageable);
 }

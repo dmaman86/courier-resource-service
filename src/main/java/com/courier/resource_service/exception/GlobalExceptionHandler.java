@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
 import com.courier.resource_service.objects.dto.ErrorLogDto;
+import com.courier.resource_service.objects.enums.ErrorSeverity;
 import com.courier.resource_service.service.ErrorLogService;
 
 import io.jsonwebtoken.JwtException;
@@ -27,60 +28,60 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(EntityNotFoundException.class)
   public ResponseEntity<ErrorLogDto> handleEntityNotFoundException(
       EntityNotFoundException ex, WebRequest request) {
-    return reportError(ex, "Entity not found", HttpStatus.NOT_FOUND, request);
+    return reportError(ex, ErrorSeverity.LOW, HttpStatus.NOT_FOUND, request);
   }
 
   @ExceptionHandler(EntityExistsException.class)
   public ResponseEntity<ErrorLogDto> handleEntityExistsException(
       EntityExistsException ex, WebRequest request) {
-    return reportError(ex, "Entity already exists", HttpStatus.CONFLICT, request);
+    return reportError(ex, ErrorSeverity.LOW, HttpStatus.CONFLICT, request);
   }
 
   @ExceptionHandler(BusinessRuleException.class)
   public ResponseEntity<ErrorLogDto> handleBusinessRuleViolation(
       BusinessRuleException ex, WebRequest request) {
-    return reportError(ex, "Business rule violation", HttpStatus.BAD_REQUEST, request);
+    return reportError(ex, ErrorSeverity.MEDIUM, HttpStatus.BAD_REQUEST, request);
   }
 
   @ExceptionHandler(TokenValidationException.class)
   public ResponseEntity<ErrorLogDto> handleTokenValidationException(
       TokenValidationException ex, WebRequest request) {
-    return reportError(ex, "Invalid token", HttpStatus.UNAUTHORIZED, request);
+    return reportError(ex, ErrorSeverity.HIGH, HttpStatus.UNAUTHORIZED, request);
   }
 
   @ExceptionHandler(PublicKeyException.class)
   public ResponseEntity<ErrorLogDto> handlePublicKeyNotAvailableException(
       PublicKeyException ex, WebRequest request) {
-    return reportError(ex, "Public key not available", HttpStatus.SERVICE_UNAVAILABLE, request);
+    return reportError(ex, ErrorSeverity.CRITICAL, HttpStatus.SERVICE_UNAVAILABLE, request);
   }
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorLogDto> handleGenericException(Exception ex, WebRequest request) {
-    return reportError(
-        ex, "An unexpected error occurred", HttpStatus.INTERNAL_SERVER_ERROR, request);
+    return reportError(ex, ErrorSeverity.CRITICAL, HttpStatus.INTERNAL_SERVER_ERROR, request);
   }
 
   @ExceptionHandler(JwtException.class)
   public ResponseEntity<ErrorLogDto> handleJwtException(JwtException ex, WebRequest request) {
-    return reportError(ex, "JWT error", HttpStatus.UNAUTHORIZED, request);
+    return reportError(ex, ErrorSeverity.HIGH, HttpStatus.UNAUTHORIZED, request);
   }
 
   @ExceptionHandler(AccessDeniedException.class)
   public ResponseEntity<ErrorLogDto> handleAccessDeniedException(
       AccessDeniedException ex, WebRequest request) {
-    return reportError(ex, "Access denied", HttpStatus.FORBIDDEN, request);
+    return reportError(ex, ErrorSeverity.HIGH, HttpStatus.FORBIDDEN, request);
   }
 
   private ResponseEntity<ErrorLogDto> reportError(
-      Exception ex, String message, HttpStatus status, WebRequest request) {
+      Exception ex, ErrorSeverity severity, HttpStatus status, WebRequest request) {
     ErrorLogDto errorLog =
         ErrorLogDto.builder()
             .timestamp(LocalDateTime.now())
             .status(status.value())
             .error(status.getReasonPhrase())
-            .message(message)
+            .message(ex.getMessage())
             .exception(ex.getClass().getName())
             .path(request.getDescription(false))
+            .severity(severity)
             .build();
     logger.error("Error: {}", errorLog);
 

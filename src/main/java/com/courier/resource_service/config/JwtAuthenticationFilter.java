@@ -11,6 +11,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.courier.resource_service.exception.PublicKeyException;
 import com.courier.resource_service.objects.dto.UserContext;
 import com.courier.resource_service.service.JwtService;
+import com.courier.resource_service.service.RedisService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -23,12 +24,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   @Autowired private JwtService jwtService;
 
+  @Autowired private RedisService redisService;
+
   protected void doFilterInternal(
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
 
     try {
-      jwtService.getPublicKey();
+      if (!redisService.hasValidPublicKey()) {
+        throw new PublicKeyException("Public key not found");
+      }
+
       String token = extractTokenFromCookies(request);
       if (token != null && jwtService.isTokenValid(token)) {
         UserContext user = jwtService.getUserContext(token);
