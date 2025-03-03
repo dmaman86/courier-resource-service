@@ -1,6 +1,7 @@
 package com.courier.resource_service.config;
 
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -10,6 +11,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.courier.resource_service.exception.PublicKeyException;
 import com.courier.resource_service.objects.dto.UserContext;
+import com.courier.resource_service.service.BlackListService;
 import com.courier.resource_service.service.JwtService;
 import com.courier.resource_service.service.RedisService;
 
@@ -26,24 +28,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   @Autowired private RedisService redisService;
 
+  @Autowired private BlackListService blackListService;
+
   protected void doFilterInternal(
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
 
-    try {
-      if (!redisService.hasValidPublicKey()) {
-        throw new PublicKeyException("Public key not found");
+    if (!redisService.hasValidPublicKey()) {
+      throw new PublicKeyException("Public key is not valid");
+    }
+    String token = extractTokenFromCookies(request);
+    if (token != null && jwtService.isTokenValid(token)) {
+      UserContext user = jwtService.getUserContext(token);
+      if (blackListService.isUserBlackListed(user.getId())) {
+        SecurityContextHolder.clearContext();
+        throw new AccessDeniedException("User is disabled");
       }
-
-      String token = extractTokenFromCookies(request);
-      if (token != null && jwtService.isTokenValid(token)) {
-        UserContext user = jwtService.getUserContext(token);
-        UsernamePasswordAuthenticationToken authentication =
-            new UsernamePasswordAuthenticationToken(user, null, user.getRoles());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-      }
-    } catch (PublicKeyException e) {
-      throw new PublicKeyException(e.getMessage());
+      UsernamePasswordAuthenticationToken authentication =
+          new UsernamePasswordAuthenticationToken(user, null, user.getRoles());
+      SecurityContextHolder.getContext().setAuthentication(authentication);
     }
     filterChain.doFilter(request, response);
   }

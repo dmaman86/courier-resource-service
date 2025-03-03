@@ -9,9 +9,9 @@ import com.courier.resource_service.objects.dto.ErrorLogDto;
 @Service
 public class ErrorLogService {
 
-  @Autowired private KafkaTemplate<String, Object> kafkaTemplate;
+  @Autowired private KafkaTemplate<String, ErrorLogDto> errorLogDtoKafkaTemplate;
 
   public void sendErrorLog(ErrorLogDto errorLogDto) {
-    kafkaTemplate.send("error-topic", errorLogDto);
+    errorLogDtoKafkaTemplate.send("error-topic", errorLogDto);
   }
 }
