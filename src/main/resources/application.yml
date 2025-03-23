@@ -20,17 +20,16 @@ spring:
     bootstrap-servers: localhost:9092
     consumer:
       group-id: resource-service-group
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      properties:
-        spring.json.trusted.packages: "*" # Allow all packages to be deserialized
+      auto-offset-reset: earliest
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
-  redis:
-    host: localhost
-    port: 6379
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: MySecretPassword123!
 
   cloud:
     openfeign:
@@ -48,10 +47,11 @@ server:
 
 eureka:
   client:
-    serviceUrl:
+    service-url:
       defaultZone: http://localhost:8761/eureka/
     fetch-registry: true
     register-with-eureka: true
 
   instance:
     hostname: courier-resource-service
+    prefer-ip-address: true
