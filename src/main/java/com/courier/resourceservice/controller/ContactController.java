@@ -2,8 +2,11 @@ package com.courier.resourceservice.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,11 +22,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.courier.resourceservice.objects.dto.ContactBaseDto;
 import com.courier.resourceservice.objects.dto.ContactDto;
+import com.courier.resourceservice.objects.request.ContactSearchRequest;
+import com.courier.resourceservice.objects.request.UsersContactSearchRequest;
 import com.courier.resourceservice.service.ContactService;
 
 @RestController
 @RequestMapping("/api/resource/contact")
 public class ContactController {
+
+  private static final Logger logger = LoggerFactory.getLogger(ContactController.class);
 
   @Autowired private ContactService contactService;
 
@@ -78,6 +85,30 @@ public class ContactController {
   public ResponseEntity<Page<ContactBaseDto>> searchContacts(
       @RequestParam String query, Pageable pageable) {
     return ResponseEntity.ok(contactService.searchContacts(query, pageable));
+  }
+
+  @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+  @PostMapping("/search/users")
+  public ResponseEntity<List<ContactBaseDto>> searchUsersContacts(
+      @RequestBody UsersContactSearchRequest request,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size) {
+    Pageable pageable = PageRequest.of(page, size);
+    Page<ContactBaseDto> contacts = contactService.searchUsersContacts(request, pageable);
+    logger.info("searchUsersContacts: {}", contacts.getContent());
+    return ResponseEntity.ok(contacts.getContent());
+  }
+
+  @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_COURIER')")
+  @PostMapping("/search/advanced")
+  public ResponseEntity<Page<ContactBaseDto>> searchAdvancedContacts(
+      @RequestBody ContactSearchRequest request,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size) {
+    Pageable pageable = PageRequest.of(page, size);
+    Page<ContactBaseDto> contacts = contactService.searchAdvancedContacts(request, pageable);
+    logger.info("searchAdvancedContacts: {}", contacts.getContent());
+    return ResponseEntity.ok(contacts);
   }
 
   @GetMapping("/office/{officeId}")

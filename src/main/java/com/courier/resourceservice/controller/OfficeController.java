@@ -5,23 +5,15 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.courier.resourceservice.objects.dto.OfficeBaseDto;
-import com.courier.resourceservice.objects.dto.OfficeDto;
-import com.courier.resourceservice.objects.response.OfficeResponse;
 import com.courier.resourceservice.service.OfficeService;
 
 @RestController
@@ -32,10 +24,10 @@ public class OfficeController {
 
   @Autowired private OfficeService officeService;
 
-  @GetMapping
-  public ResponseEntity<Page<OfficeResponse>> getAllOffices(Pageable pageable) {
-    return ResponseEntity.ok(officeService.getOffices(pageable));
-  }
+  // @GetMapping
+  // public ResponseEntity<Page<OfficeResponse>> getAllOffices(Pageable pageable) {
+  //   return ResponseEntity.ok(officeService.getOffices(pageable));
+  // }
 
   @GetMapping("/all")
   public ResponseEntity<List<OfficeBaseDto>> getAllOfficesWithoutPagination() {
@@ -43,29 +35,35 @@ public class OfficeController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<OfficeBaseDto> getOfficeById(@PathVariable Long id) {
-    return ResponseEntity.ok(officeService.getOfficeById(id));
+  public ResponseEntity<OfficeBaseDto> getOfficeBaseById(@PathVariable Long id) {
+    return ResponseEntity.ok(officeService.getOfficeBaseById(id));
   }
 
-  @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-  @PostMapping("/base")
-  public ResponseEntity<OfficeResponse> createOffice(@RequestBody OfficeBaseDto officeBaseDto) {
-    logger.info("Get officeBaseDto: {}", officeBaseDto);
-    return ResponseEntity.ok(officeService.createOffice(officeBaseDto));
-  }
+  // @GetMapping("/dto/{id}")
+  // public ResponseEntity<OfficeDto> getOfficeById(@PathVariable Long id) {
+  //   return ResponseEntity.ok(officeService.getOfficeById(id));
+  // }
 
-  @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-  @PostMapping
-  public ResponseEntity<OfficeResponse> createOfficeWithBranches(@RequestBody OfficeDto officeDto) {
-    return ResponseEntity.ok(officeService.createOfficeWithBranches(officeDto));
-  }
+  // @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+  // @PostMapping("/base")
+  // public ResponseEntity<OfficeResponse> createOffice(@RequestBody OfficeBaseDto officeBaseDto) {
+  //   logger.info("Get officeBaseDto: {}", officeBaseDto);
+  //   return ResponseEntity.ok(officeService.createOffice(officeBaseDto));
+  // }
 
-  @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-  @PutMapping("/{id}")
-  public ResponseEntity<OfficeResponse> updateOffice(
-      @PathVariable Long id, @RequestBody OfficeDto officeDto) {
-    return ResponseEntity.ok(officeService.updateOffice(id, officeDto));
-  }
+  // @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+  // @PostMapping
+  // public ResponseEntity<OfficeResponse> createOfficeWithBranches(@RequestBody OfficeDto
+  // officeDto) {
+  //   return ResponseEntity.ok(officeService.createOfficeWithBranches(officeDto));
+  // }
+
+  // @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+  // @PutMapping("/{id}")
+  // public ResponseEntity<OfficeResponse> updateOffice(
+  //     @PathVariable Long id, @RequestBody OfficeDto officeDto) {
+  //   return ResponseEntity.ok(officeService.updateOffice(id, officeDto));
+  // }
 
   @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   @DeleteMapping("/{id}")
@@ -74,9 +72,9 @@ public class OfficeController {
     return ResponseEntity.noContent().build();
   }
 
-  @GetMapping("/search")
-  public ResponseEntity<Page<OfficeResponse>> searchOffices(
-      @RequestParam String query, Pageable pageable) {
-    return ResponseEntity.ok(officeService.searchOffices(query, pageable));
-  }
+  // @GetMapping("/search")
+  // public ResponseEntity<Page<OfficeResponse>> searchOffices(
+  //     @RequestParam String query, Pageable pageable) {
+  //   return ResponseEntity.ok(officeService.searchOffices(query, pageable));
+  // }
 }

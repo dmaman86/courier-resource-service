@@ -15,6 +15,8 @@ import com.courier.resourceservice.objects.dto.ContactBaseDto;
 import com.courier.resourceservice.objects.dto.ContactDto;
 import com.courier.resourceservice.objects.entity.Contact;
 import com.courier.resourceservice.objects.mapper.ContactMapper;
+import com.courier.resourceservice.objects.request.ContactSearchRequest;
+import com.courier.resourceservice.objects.request.UsersContactSearchRequest;
 import com.courier.resourceservice.repository.ContactRepository;
 import com.courier.resourceservice.service.ContactService;
 
@@ -98,6 +100,22 @@ public class ContactServiceImpl implements ContactService {
     }
 
     Specification<Contact> spec = ContactCriteria.containsText(searchQuery);
+    Page<Contact> contacts = contactRepository.findAll(spec, pageable);
+    return contacts.map(contactMapper::toBaseDto);
+  }
+
+  @Override
+  public Page<ContactBaseDto> searchUsersContacts(
+      UsersContactSearchRequest request, Pageable pageable) {
+    Specification<Contact> spec = ContactCriteria.containsSpec(request);
+    Page<Contact> contacts = contactRepository.findAll(spec, pageable);
+    return contacts.map(contactMapper::toBaseDto);
+  }
+
+  @Override
+  public Page<ContactBaseDto> searchAdvancedContacts(
+      ContactSearchRequest request, Pageable pageable) {
+    Specification<Contact> spec = ContactCriteria.extendedSpec(request);
     Page<Contact> contacts = contactRepository.findAll(spec, pageable);
     return contacts.map(contactMapper::toBaseDto);
   }

@@ -1,12 +1,14 @@
 package com.courier.resourceservice.service;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.courier.resourceservice.objects.dto.BranchBaseDto;
 import com.courier.resourceservice.objects.dto.BranchDto;
+import com.courier.resourceservice.objects.request.BranchSearchRequest;
 
 public interface BranchService {
 
@@ -20,6 +22,8 @@ public interface BranchService {
 
   List<BranchBaseDto> getBranchesByOfficeId(Long officeId);
 
+  Set<String> getBranchCities();
+
   BranchDto getBranchById(Long id);
 
   BranchDto createBranch(BranchDto branchDto);
@@ -29,4 +33,6 @@ public interface BranchService {
   void disabledBranch(Long id);
 
   Page<BranchDto> searchBranches(String searchQuery, Pageable pageable);
+
+  Page<BranchDto> searchAdvancedBranches(BranchSearchRequest request, Pageable pageable);
 }

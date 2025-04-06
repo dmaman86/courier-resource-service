@@ -8,7 +8,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -44,11 +43,11 @@ public class Office {
 
   private LocalDateTime disabledAt;
 
-  @OneToMany(mappedBy = "office", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "office", cascade = CascadeType.ALL)
   @ToString.Exclude
   private List<Branch> branches;
 
-  @OneToMany(mappedBy = "office", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "office", cascade = CascadeType.ALL)
   @ToString.Exclude
   private List<Contact> contacts;
 }

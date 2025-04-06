@@ -1,6 +1,9 @@
 package com.courier.resourceservice.service.impl;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +16,7 @@ import com.courier.resourceservice.objects.dto.BranchBaseDto;
 import com.courier.resourceservice.objects.dto.BranchDto;
 import com.courier.resourceservice.objects.entity.Branch;
 import com.courier.resourceservice.objects.mapper.BranchMapper;
+import com.courier.resourceservice.objects.request.BranchSearchRequest;
 import com.courier.resourceservice.repository.BranchRepository;
 import com.courier.resourceservice.service.BranchService;
 
@@ -62,6 +66,16 @@ public class BranchServiceImpl implements BranchService {
   }
 
   @Override
+  public Set<String> getBranchCities() {
+    List<Branch> branches = branchRepository.findByEnabledTrue();
+
+    return branches.stream()
+        .map(Branch::getCity)
+        .filter(Objects::nonNull)
+        .collect(Collectors.toSet());
+  }
+
+  @Override
   public BranchDto getBranchById(Long id) {
     return branchRepository
         .findById(id)
@@ -92,6 +106,14 @@ public class BranchServiceImpl implements BranchService {
     }
 
     Specification<Branch> spec = BranchCriteria.containsText(searchQuery);
+    Page<Branch> branches = branchRepository.findAll(spec, pageable);
+
+    return branches.map(branchMapper::toDto);
+  }
+
+  @Override
+  public Page<BranchDto> searchAdvancedBranches(BranchSearchRequest request, Pageable pageable) {
+    Specification<Branch> spec = BranchCriteria.advancedSearch(request);
     Page<Branch> branches = branchRepository.findAll(spec, pageable);
 
     return branches.map(branchMapper::toDto);

@@ -2,28 +2,25 @@ package com.courier.resourceservice.service;
 
 import java.util.List;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 import com.courier.resourceservice.objects.dto.OfficeBaseDto;
-import com.courier.resourceservice.objects.dto.OfficeDto;
-import com.courier.resourceservice.objects.response.OfficeResponse;
 
 public interface OfficeService {
 
-  Page<OfficeResponse> getOffices(Pageable pageable);
+  // Page<OfficeResponse> getOffices(Pageable pageable);
 
   List<OfficeBaseDto> getOfficesWithoutPagination();
 
-  OfficeBaseDto getOfficeById(Long id);
+  OfficeBaseDto getOfficeBaseById(Long id);
 
-  OfficeResponse createOffice(OfficeBaseDto officeBaseDto);
+  // OfficeDto getOfficeById(Long id);
 
-  OfficeResponse createOfficeWithBranches(OfficeDto officeDto);
+  OfficeBaseDto createOffice(OfficeBaseDto officeBaseDto);
 
-  OfficeResponse updateOffice(Long id, OfficeDto officeDto);
+  // OfficeResponse createOfficeWithBranches(OfficeDto officeDto);
+
+  OfficeBaseDto updateOffice(Long id, OfficeBaseDto officeDto);
 
   void disabledOffice(Long id);
 
-  Page<OfficeResponse> searchOffices(String searchQuery, Pageable pageable);
+  // Page<OfficeResponse> searchOffices(String searchQuery, Pageable pageable);
 }

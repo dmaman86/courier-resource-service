@@ -11,36 +11,30 @@ import com.courier.resourceservice.exception.BussinessRuleException;
 import com.courier.resourceservice.exception.EntityExistsException;
 import com.courier.resourceservice.exception.EntityNotFoundException;
 import com.courier.resourceservice.objects.dto.BranchDto;
+import com.courier.resourceservice.objects.dto.OfficeBaseDto;
 import com.courier.resourceservice.objects.entity.Branch;
 import com.courier.resourceservice.objects.entity.Contact;
 import com.courier.resourceservice.objects.entity.Office;
 import com.courier.resourceservice.repository.BranchRepository;
 import com.courier.resourceservice.repository.ContactRepository;
-import com.courier.resourceservice.repository.OfficeRepository;
 
 @Component
 public class BranchManager {
 
   @Autowired private BranchRepository branchRepository;
-  @Autowired private OfficeRepository officeRepository;
   @Autowired private ContactRepository contactRepository;
-
-  // @Autowired private BranchMapper branchMapper;
+  @Autowired private OfficeManager officeManager;
 
   @Transactional
   public Branch createBranch(BranchDto branchDto) {
-    Office office =
-        officeRepository
-            .findById(branchDto.getOffice().getId())
-            .orElseThrow(() -> new EntityNotFoundException("Office not found"));
+    Office office = getOffice(branchDto.getOffice());
 
     boolean existsBranch =
         branchRepository.existsByCityAndAddressAndOfficeIdAndEnabledTrue(
-            branchDto.getCity(), branchDto.getAddress(), branchDto.getOffice().getId());
+            branchDto.getCity(), branchDto.getAddress(), office.getId());
 
     if (existsBranch) throw new EntityExistsException("Branch already exists");
 
-    // Branch branch = branchMapper.toEntity(branchDto);
     Branch branch =
         Branch.builder().city(branchDto.getCity()).address(branchDto.getAddress()).build();
     branch.setOffice(office);
@@ -56,10 +50,7 @@ public class BranchManager {
             .findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Branch not found"));
 
-    Office newOffice =
-        officeRepository
-            .findById(branchDto.getOffice().getId())
-            .orElseThrow(() -> new EntityNotFoundException("Office not found"));
+    Office newOffice = getOffice(branchDto.getOffice());
 
     boolean isCityChanged = !branch.getCity().equals(branchDto.getCity());
     boolean isAddressChanged = !branch.getAddress().equals(branchDto.getAddress());
@@ -73,6 +64,10 @@ public class BranchManager {
       if (exists)
         throw new EntityExistsException(
             "Another branch with the same city and address already exists for this office");
+    }
+
+    if (!isOfficeChanged) {
+      newOffice = officeManager.updateOffice(branch.getOffice().getId(), branchDto.getOffice());
     }
 
     branch.setCity(branchDto.getCity());
@@ -104,5 +99,13 @@ public class BranchManager {
     branch.setEnabled(false);
     branch.setDisabledAt(LocalDateTime.now());
     branchRepository.save(branch);
+  }
+
+  @Transactional(readOnly = true)
+  private Office getOffice(OfficeBaseDto office) {
+    if (office.getId() != null) {
+      return officeManager.getOfficeById(office.getId());
+    }
+    return officeManager.createOffice(office);
   }
 }

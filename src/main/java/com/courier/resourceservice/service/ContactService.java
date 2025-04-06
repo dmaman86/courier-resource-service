@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 
 import com.courier.resourceservice.objects.dto.ContactBaseDto;
 import com.courier.resourceservice.objects.dto.ContactDto;
+import com.courier.resourceservice.objects.request.ContactSearchRequest;
+import com.courier.resourceservice.objects.request.UsersContactSearchRequest;
 
 public interface ContactService {
 
@@ -31,4 +33,8 @@ public interface ContactService {
   ContactDto enableContact(ContactDto contactDto);
 
   Page<ContactBaseDto> searchContacts(String searchQuery, Pageable pageable);
+
+  Page<ContactBaseDto> searchUsersContacts(UsersContactSearchRequest request, Pageable pageable);
+
+  Page<ContactBaseDto> searchAdvancedContacts(ContactSearchRequest request, Pageable pageable);
 }

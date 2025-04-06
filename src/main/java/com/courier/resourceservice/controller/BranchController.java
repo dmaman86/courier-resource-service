@@ -1,9 +1,11 @@
 package com.courier.resourceservice.controller;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.courier.resourceservice.objects.dto.BranchBaseDto;
 import com.courier.resourceservice.objects.dto.BranchDto;
+import com.courier.resourceservice.objects.request.BranchSearchRequest;
 import com.courier.resourceservice.service.BranchService;
 
 @RestController
@@ -35,6 +38,11 @@ public class BranchController {
   @GetMapping("/all")
   public ResponseEntity<List<BranchBaseDto>> getAllBranchesWithoutPagination() {
     return ResponseEntity.ok(branchService.getBranchesWithoutPagination());
+  }
+
+  @GetMapping("/cities")
+  public ResponseEntity<Set<String>> getBranchCities() {
+    return ResponseEntity.ok(branchService.getBranchCities());
   }
 
   @GetMapping("/office/{officeId}")
@@ -83,5 +91,14 @@ public class BranchController {
   public ResponseEntity<Page<BranchDto>> searchBranches(
       @RequestParam String query, Pageable pageable) {
     return ResponseEntity.ok(branchService.searchBranches(query, pageable));
+  }
+
+  @PostMapping("/search/advanced")
+  public ResponseEntity<Page<BranchDto>> searchAdvancedBranches(
+      @RequestBody BranchSearchRequest request,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size) {
+    Pageable pageable = PageRequest.of(page, size);
+    return ResponseEntity.ok(branchService.searchAdvancedBranches(request, pageable));
   }
 }
